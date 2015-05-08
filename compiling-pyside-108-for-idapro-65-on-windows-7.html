@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+          <title>gsallesl.github.io</title>
+        <meta charset="utf-8" />
+        <link href="/feed" type="application/atom+xml" rel="alternate" title="gsallesl.github.io Full Atom Feed" />
+
+
+
+    <meta name="tags" content="IDAPRO" />
+    <meta name="tags" content="MARE" />
+
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="./">gsallesl.github.io <strong></strong></a></h1>
+        </header><!-- /#banner -->
+        <nav id="menu"><ul>
+        </ul></nav><!-- /#menu -->
+<section id="content" class="body">
+  <header>
+    <h2 class="entry-title">
+      <a href="./compiling-pyside-108-for-idapro-65-on-windows-7.html" rel="bookmark"
+         title="Permalink to Compiling PySide 1.0.8 for IDAPRO 6.5 on Windows 7">Compiling PySide 1.0.8 for IDAPRO 6.5 on Windows 7</a></h2>
+ 
+  </header>
+  <footer class="post-info">
+    <abbr class="published" title="2015-05-07T10:20:00+02:00">
+      Thu 07 May 2015
+    </abbr>
+    <abbr class="modified" title="2015-05-07T19:30:00+02:00">
+      (last modified 07/05/2015)
+    </abbr>
+    <address class="vcard author">
+      By           <a class="url fn" href="./">Gabriel</a>
+          <a class="url fn" href="./">Pengfei</a>
+          <a class="url fn" href="./">Luis</a>
+    </address>
+  </footer><!-- /.post-info -->
+  <div class="entry-content">
+    <p>The <a href="https://gist.github.com/ancat/8078106">Compiling PySide for IDA Pro on Windows</a> page provides very useful instructions. However, as we tried to compile PySide following these instructions, we had to make a few changes to the <code>packaging</code>, <code>shiboken</code>, and <code>PySide</code> repositories to make the PySide plugging compile properly.</p>
+<p>First you will notice that the <code>build.py</code> script under packaging/setuptools automatically removes the modules directory. This behavior prevents us to apply the <a href="http://dvlabs.tippingpoint.com/img/mindshare/pyside_diff.diff">initial patch</a> correctly. We broke down this patchset by repository: our new patches can be applied to each repository/module individually.</p>
+<p>We also made two small changes to the shiboken patch and PySide patch to successfully compile the PySide module. The resulting installer under packaging\setuptools\dist should work properly. </p>
+<p>The 5 corresponding patches are available bellow:</p>
+<ul>
+<li><a href="../code/pyside_patch/pyside_packaging.diff">Patch for <code>packaging/setuptools/build.py</code></a></li>
+<li><a href="../code/pyside_patch/pyside_Apiextractor.diff">Patch for <code>packaging/setuptools/modules/Apiextractor</code></a></li>
+<li><a href="../code/pyside_patch/pyside_Generatorrunner.diff">Patch for <code>packaging/setuptools/modules/Generatorrunner</code></a></li>
+<li><a href="../code/pyside_patch/pyside_Shiboken.diff">Patch for <code>packaging/setuptools/modules/Shiboken</code></a></li>
+<li><a href="../code/pyside_patch/pyside_PySide.diff">Patch for <code>packaging/setuptools/modules/PySide</code></a></li>
+</ul>
+  </div><!-- /.entry-content -->
+</section>
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">gsallesl.github.io
+                </address><!-- /#about -->
+        </footer><!-- /#contentinfo -->
+</body>
+</html>
