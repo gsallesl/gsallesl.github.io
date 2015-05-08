@@ -1,0 +1,33 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5799106..f566321 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -10,6 +10,10 @@ option(INSTALL_TESTS "Install tests" FALSE)
+ option(TEST_INSTALL_DIR "Test install directory" FALSE)
+ option(ENABLE_VERSION_SUFFIX "Used to use current version in suffix to generated files. This is used to allow multiples versions installed simultaneous." FALSE)
+ 
++IF (NOT $ENV{QT_NAMESPACE} STREQUAL "")
++  add_definitions(-DQT_NAMESPACE=$ENV{QT_NAMESPACE})
++ENDIF (NOT $ENV{QT_NAMESPACE} STREQUAL "")
++
+ if(MSVC)
+     set(CMAKE_CXX_FLAGS "/Zc:wchar_t- /EHsc /DWIN32 /D_WINDOWS /D_SCL_SECURE_NO_WARNINGS")
+ else()
+diff --git a/generator.h b/generator.h
+index eeaa07e..fe0af42 100644
+--- a/generator.h
++++ b/generator.h
+@@ -29,10 +29,13 @@
+ #include <QtCore/QLinkedList>
+ #include <abstractmetalang.h>
+ #include "generatorrunnermacros.h"
++ #include <QtCore/qnamespace.h>
+ 
+ class ApiExtractor;
+ class AbstractMetaBuilder;
++QT_BEGIN_NAMESPACE
+ class QFile;
++QT_END_NAMESPACE
+ 
+ #define EXPORT_GENERATOR_PLUGIN(X)\
+ extern "C" GENRUNNER_EXPORT void getGenerators(GeneratorList* list)\

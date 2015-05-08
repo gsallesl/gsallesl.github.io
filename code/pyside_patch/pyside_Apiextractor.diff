@@ -1,0 +1,141 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2c062ae..8b0605b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -59,6 +59,7 @@ add_definitions(${QT_DEFINITIONS})
+ add_definitions(-DQT_PLUGIN)
+ add_definitions(-DQT_SHARED)
+ add_definitions(-DRXX_ALLOCATOR_INIT_0)
++add_definitions(-DQT_NAMESPACE=$ENV{QT_NAMESPACE})
+ 
+ if(ENABLE_VERSION_SUFFIX)
+     set(apiextractor_SUFFIX "-${apiextractor_MAJOR_VERSION}.${apiextractor_MINOR_VERSION}")
+diff --git a/apiextractor.h b/apiextractor.h
+index 0a71f1a..8e9a772 100644
+--- a/apiextractor.h
++++ b/apiextractor.h
+@@ -30,7 +30,10 @@
+ #include <QStringList>
+ 
+ class AbstractMetaBuilder;
++
++QT_BEGIN_NAMESPACE
+ class QIODevice;
++QT_END_NAMESPACE
+ 
+ class APIEXTRACTOR_API ApiExtractor
+ {
+diff --git a/docparser.h b/docparser.h
+index 6764333..7dbb0cf 100644
+--- a/docparser.h
++++ b/docparser.h
+@@ -28,9 +28,11 @@
+ 
+ #include "abstractmetalang.h"
+ 
++QT_BEGIN_NAMESPACE
+ class QDomDocument;
+ class QDomNode;
+ class QXmlQuery;
++QT_END_NAMESPACE
+ 
+ class APIEXTRACTOR_API DocParser
+ {
+diff --git a/include.h b/include.h
+index d5ba479..1d8be14 100644
+--- a/include.h
++++ b/include.h
+@@ -28,7 +28,9 @@
+ #include <QString>
+ #include <QList>
+ 
++QT_BEGIN_NAMESPACE
+ class QTextStream;
++QT_END_NAMESPACE
+ 
+ class APIEXTRACTOR_API Include
+ {
+diff --git a/parser/ast.h b/parser/ast.h
+index d984976..ed43732 100644
+--- a/parser/ast.h
++++ b/parser/ast.h
+@@ -26,10 +26,13 @@
+ #ifndef AST_H
+ #define AST_H
+ 
++#include <qglobal.h>
+ #include "smallobject.h"
+ #include "list.h"
+ 
++QT_BEGIN_NAMESPACE
+ class QString;
++QT_END_NAMESPACE
+ 
+ #define DECLARE_AST_NODE(k) \
+     enum { __node_kind = Kind_##k };
+diff --git a/parser/compiler_utils.h b/parser/compiler_utils.h
+index fdd96f1..faa6780 100644
+--- a/parser/compiler_utils.h
++++ b/parser/compiler_utils.h
+@@ -30,8 +30,11 @@
+ 
+ #include "codemodel.h"
+ 
++QT_BEGIN_NAMESPACE
+ class QString;
+ class QStringList;
++QT_END_NAMESPACE
++
+ struct TypeSpecifierAST;
+ struct DeclaratorAST;
+ class TokenStream;
+diff --git a/parser/rpp/preprocessor.h b/parser/rpp/preprocessor.h
+index c363ea7..bb79692 100644
+--- a/parser/rpp/preprocessor.h
++++ b/parser/rpp/preprocessor.h
+@@ -29,7 +29,10 @@
+ #include <QtCore/qstring.h>
+ #include <QtCore/qstringlist.h>
+ 
++QT_BEGIN_NAMESPACE
+ class QByteArray;
++QT_END_NAMESPACE
++
+ class PreprocessorPrivate;
+ 
+ class Preprocessor
+diff --git a/reporthandler.h b/reporthandler.h
+index f1fae50..a50cde6 100644
+--- a/reporthandler.h
++++ b/reporthandler.h
+@@ -21,10 +21,15 @@
+  *
+  */
+ 
++#include "include.h"
++
+ #ifndef REPORTHANDLER_H
+ #define REPORTHANDLER_H
+ 
++QT_BEGIN_NAMESPACE
+ class QString;
++QT_END_NAMESPACE
++
+ #include "apiextractormacros.h"
+ 
+ class APIEXTRACTOR_API ReportHandler
+diff --git a/typesystem.h b/typesystem.h
+index c915cd4..16889f7 100644
+--- a/typesystem.h
++++ b/typesystem.h
+@@ -39,7 +39,10 @@
+ class Indentor;
+ 
+ class AbstractMetaType;
++
++QT_BEGIN_NAMESPACE
+ class QTextStream;
++QT_END_NAMESPACE
+ 
+ class EnumTypeEntry;
+ class FlagsTypeEntry;

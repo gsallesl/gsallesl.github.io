@@ -1,0 +1,152 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index aa2d1e8..f60949a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -21,6 +21,10 @@ if(USE_XVFB)
+     endif()
+ endif()
+ 
++IF (NOT $ENV{QT_NAMESPACE} STREQUAL "")
++  add_definitions(-DQT_NAMESPACE=$ENV{QT_NAMESPACE})
++ENDIF (NOT $ENV{QT_NAMESPACE} STREQUAL "")
++
+ option(BUILD_TESTS "Build tests." TRUE)
+ option(ENABLE_VERSION_SUFFIX "Used to use current version in suffix to generated files. This is used to allow multiples versions installed simultaneous." FALSE)
+ set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
+diff --git a/PySide/CMakeLists.txt b/PySide/CMakeLists.txt
+index 62c8068..d3c584f 100644
+--- a/PySide/CMakeLists.txt
++++ b/PySide/CMakeLists.txt
+@@ -19,7 +19,7 @@ HAS_QT_MODULE(QT_QTWEBKIT_FOUND QtWebKit)
+ HAS_QT_MODULE(QT_QTSVG_FOUND QtSvg)
+ HAS_QT_MODULE(QT_QTXML_FOUND QtXml)
+ HAS_QT_MODULE(QT_QTTEST_FOUND QtTest)
+-HAS_QT_MODULE(QT_QTOPENGL_FOUND QtOpenGL)
++#HAS_QT_MODULE(QT_QTOPENGL_FOUND QtOpenGL)
+ HAS_QT_MODULE(QT_QTSQL_FOUND QtSql)
+ if(QT_QTDESIGNER_FOUND)
+     HAS_QT_MODULE(QT_QTUITOOLS_FOUND QtUiTools)
+@@ -30,7 +30,7 @@ HAS_QT_MODULE(QT_QTMAEMO5_FOUND QtMaemo5)
+ HAS_QT_MODULE(QT_QTSCRIPT_FOUND QtScript)
+ HAS_QT_MODULE(QT_QTSCRIPTTOOLS_FOUND QtScriptTools)
+ HAS_QT_MODULE(QT_QTMULTIMEDIA_FOUND QtMultimedia)
+-HAS_QT_MODULE(QT_PHONON_FOUND phonon)
++#HAS_QT_MODULE(QT_PHONON_FOUND phonon)
+ HAS_QT_MODULE(QT_QTDECLARATIVE_FOUND QtDeclarative)
+ 
+ # install
+diff --git a/PySide/QtCore/typesystem_core.xml b/PySide/QtCore/typesystem_core.xml
+index e9ff13d..dc4bfd7 100644
+--- a/PySide/QtCore/typesystem_core.xml
++++ b/PySide/QtCore/typesystem_core.xml
+@@ -3334,6 +3334,7 @@ s1.addTransition(button.clicked, s1h)&lt;/code>
+   </add-function>
+ 
+   <inject-code class="native" position="beginning">
++    QT_BEGIN_NAMESPACE
+     extern bool
+     qRegisterResourceData(int,
+                         const unsigned char *,
+@@ -3345,6 +3346,7 @@ s1.addTransition(button.clicked, s1h)&lt;/code>
+                             const unsigned char *,
+                             const unsigned char *,
+                             const unsigned char *);
++    QT_END_NAMESPACE
+   </inject-code>
+   <add-function signature="qRegisterResourceData(int, PyBytes, PyBytes, PyBytes)" return-type="bool">
+     <inject-code class="target" position="beginning">
+diff --git a/PySide/QtDeclarative/CMakeLists.txt b/PySide/QtDeclarative/CMakeLists.txt
+index 01cf877..f647cb5 100644
+--- a/PySide/QtDeclarative/CMakeLists.txt
++++ b/PySide/QtDeclarative/CMakeLists.txt
+@@ -47,7 +47,6 @@ set(QtDeclarative_libraries   pyside
+                               ${QT_QTSVG_LIBRARY}
+                               ${QT_QTSQL_LIBRARY}
+                               ${QT_QTXMLPATTERNS_LIBRARY}
+-                              ${QT_QTOPENGL_LIBRARY}
+                               ${QT_QTDECLARATIVE_LIBRARY})
+ 
+ set(QtDeclarative_deps QtGui QtNetwork)
+diff --git a/PySide/QtGui/CMakeLists.txt b/PySide/QtGui/CMakeLists.txt
+index 8f8ff97..8a9f9ea 100644
+--- a/PySide/QtGui/CMakeLists.txt
++++ b/PySide/QtGui/CMakeLists.txt
+@@ -396,7 +396,7 @@ ${CMAKE_CURRENT_BINARY_DIR}/PySide/QtGui/qwizard_wrapper.cpp
+ ${CMAKE_CURRENT_BINARY_DIR}/PySide/QtGui/qworkspace_wrapper.cpp
+ 
+ ${SPECIFIC_OS_FILES}
+-${QPYTEXTOBJECT_MOC}
++
+ ${QtGui_46_SRC}
+ ${QtGui_OPTIONAL_SRC}
+ )
+@@ -425,7 +425,7 @@ create_pyside_module(QtGui
+                      QtGui_deps
+                      QtGui_typesystem_path
+                      QtGui_SRC
+-                     ""
++                     QPYTEXTOBJECT_MOC
+                      ${CMAKE_CURRENT_BINARY_DIR}/typesystem_gui.xml)
+ 
+ install(FILES ${pyside_SOURCE_DIR}/qpytextobject.h DESTINATION include/PySide/QtGui/)
+diff --git a/PySide/QtGui/typesystem_gui_common.xml b/PySide/QtGui/typesystem_gui_common.xml
+index 4b0785b..ea4191e 100644
+--- a/PySide/QtGui/typesystem_gui_common.xml
++++ b/PySide/QtGui/typesystem_gui_common.xml
+@@ -3981,6 +3981,11 @@
+       <include file-name="QMessageBox" location="global"/>
+       <include file-name="glue/qwidget_glue.h" location="local"/>
+     </extra-includes>
++    <add-function signature="FromCObject(PyObject*)" return-type="PyObject*" static="yes">
++        <inject-code class="target" position="beginning">
++   <![CDATA[ %PYARG_0 = Shiboken::createWrapper<QWidget>((const QWidget *)PyCObject_AsVoidPtr(%1), false, false); ]]>
++        </inject-code>
++    </add-function>
+ 
+     <enum-type name="RenderFlag" flags="RenderFlags"/>
+ 
+diff --git a/PySide/__init__.py.in b/PySide/__init__.py.in
+index 9536718..886289f 100644
+--- a/PySide/__init__.py.in
++++ b/PySide/__init__.py.in
+@@ -1,6 +1,6 @@
+ import sys
+ 
+-__all__ = ['QtCore', 'QtGui', 'QtNetwork', 'QtOpenGL', 'QtSql', 'QtSvg', 'QtTest', 'QtWebKit', 'QtScript']
++__all__ = ['QtCore', 'QtGui', 'QtNetwork', 'QtSql', 'QtSvg', 'QtTest', 'QtWebKit', 'QtScript']
+ 
+ if sys.version_info[0] < 3:
+     import private
+diff --git a/PySide/global.h.in b/PySide/global.h.in
+index acd30d0..2386472 100644
+--- a/PySide/global.h.in
++++ b/PySide/global.h.in
+@@ -412,8 +412,8 @@ QT_END_HEADER
+ //QtHelp need be included after QtSql
+ #include "@QT_QTHELP_INCLUDE_DIR@/QtHelp"
+ 
+-#ifndef QT_NO_OPENGL
+-#include <@GL_H@>
+-#include <@QT_QTOPENGL_INCLUDE_DIR@/QtOpenGL>
+-#endif // QT_NO_OPENGL
++//#ifndef QT_NO_OPENGL
++//#include <@GL_H@>
++//#include <@QT_QTOPENGL_INCLUDE_DIR@/QtOpenGL>
++//#endif // QT_NO_OPENGL
+ 
+diff --git a/libpyside/signalmanager.h b/libpyside/signalmanager.h
+index a464e99..b279934 100644
+--- a/libpyside/signalmanager.h
++++ b/libpyside/signalmanager.h
+@@ -29,8 +29,11 @@
+ #include <QStringList>
+ #include <QMetaMethod>
+ #include <QMetaType>
++#include <QtCore/qnamespace.h>
+ 
++QT_BEGIN_NAMESPACE
+ class QObject;
++QT_END_NAMESPACE
+ 
+ namespace PySide
+ {

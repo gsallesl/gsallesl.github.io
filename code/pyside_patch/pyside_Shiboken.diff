@@ -1,0 +1,41 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 45dda1b..a1aea6c 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -17,6 +17,10 @@ set(shiboken_MINOR_VERSION "0")
+ set(shiboken_MICRO_VERSION "9")
+ set(shiboken_VERSION "${shiboken_MAJOR_VERSION}.${shiboken_MINOR_VERSION}.${shiboken_MICRO_VERSION}")
+ 
++IF (NOT $ENV{QT_NAMESPACE} STREQUAL "")
++  add_definitions(-DQT_NAMESPACE=$ENV{QT_NAMESPACE})
++ENDIF (NOT $ENV{QT_NAMESPACE} STREQUAL "")
++
+ option(BUILD_TESTS "Build tests." TRUE)
+ option(USE_PYTHON3 "Use python3 libraries to build shiboken." FALSE)
+ 
+diff --git a/libshiboken/basewrapper.cpp b/libshiboken/basewrapper.cpp
+index d0d6643..4fcc3e9 100644
+--- a/libshiboken/basewrapper.cpp
++++ b/libshiboken/basewrapper.cpp
+@@ -233,7 +233,7 @@ void SbkDeallocWrapperWithPrivateDtor(PyObject* self)
+         PyObject_ClearWeakRefs(self);
+ 
+     Shiboken::BindingManager::instance().releaseWrapper(sbkObj);
+-    Shiboken::Object::deallocData(sbkObj);
++    Shiboken::Object::deallocData(sbkObj, true);
+ }
+ 
+ void SbkObjectTypeDealloc(PyObject* pyObj)
+diff --git a/libshiboken/basewrapper_p.h b/libshiboken/basewrapper_p.h
+index f34e710..3f36acc 100644
+--- a/libshiboken/basewrapper_p.h
++++ b/libshiboken/basewrapper_p.h
+@@ -249,7 +249,7 @@ void clearReferences(SbkObject* self);
+ /**
+  * Destroy internal data
+  **/
+-void deallocData(SbkObject* self);
++void deallocData(SbkObject* self, bool doCleanup);
+ } // namespace Object
+ 
+ } // namespace Shiboken
