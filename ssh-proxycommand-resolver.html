@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+          <title>gsallesl.github.io</title>
+        <meta charset="utf-8" />
+
+
+	<link href="./theme/css/pygments/emacs.css" rel="stylesheet" />
+	<link href="./theme/css/style.css" rel="stylesheet" />
+        <link href="/feed" type="application/atom+xml" rel="alternate" title="gsallesl.github.io Full Atom Feed" />
+
+
+
+    <meta name="tags" content="admin" />
+    <meta name="tags" content="SSH" />
+    <meta name="tags" content="ProxyCommand" />
+    <meta name="tags" content="mobility" />
+
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="./">gsallesl.github.io <strong></strong></a></h1>
+        </header><!-- /#banner -->
+        <nav id="menu"><ul>
+        </ul></nav><!-- /#menu -->
+<section id="content" class="body">
+  <header>
+    <h2 class="entry-title">
+      <a href="./ssh-proxycommand-resolver.html" rel="bookmark"
+         title="Permalink to SSH ProxyCommand Resolver">SSH ProxyCommand Resolver</a></h2>
+ 
+  </header>
+  <footer class="post-info">
+    <abbr class="published" title="2015-05-12T10:20:00+02:00">
+      Tue 12 May 2015
+    </abbr>
+    <abbr class="modified" title="2015-05-12T19:30:00+02:00">
+      (last modified 12/05/2015)
+    </abbr>
+    <address class="vcard author">
+      By           <a class="url fn" href="./">Gabriel</a>
+    </address>
+  </footer><!-- /.post-info -->
+  <div class="entry-content">
+    <p>SSH ProxyResolver dynamically determines the <code>ProxyCommand</code> to use for a SSH <code>Host</code> alias based on your current network connection and a configuration you provide.</p>
+<p>SSH ProxyCommand configuration parameter provides a great way to nicely access a computer not directly accessible on the internet with a simple command.</p>
+<p>This configuration parameter is particularly useful on a laptop SSH configuration to access such a system. You may have to change this parameter when switching between networks: </p>
+<ul>
+<li>When connected to the same network as <code>myhost</code>:</li>
+</ul>
+<div class="highlight"><pre><span class="c"># .ssh/config</span>
+Host myhost
+HostName IPAddress
+</pre></div>
+
+
+<ul>
+<li>When proxying via a server facing the internet that can access <code>myhost</code>:</li>
+</ul>
+<div class="highlight"><pre><span class="c"># .ssh/config</span>
+Host myhost
+ProxyCommand ssh internet_facing_server_IP -W IPAddress:some_port
+</pre></div>
+
+
+<ul>
+<li>When using a meeting point on another server, for example when the system facing the internet and on the same network as <code>myhost</code> is down:</li>
+</ul>
+<p>On my host:</p>
+<div class="highlight"><pre>ssh -NR 2345:localhost:22  internet_facing_server2_IP
+</pre></div>
+
+
+<p>On the client:</p>
+<div class="highlight"><pre><span class="c"># .ssh/config</span>
+Host myhost
+ProxyCommand ssh internet_facing_server2_IP -W localhost:2345
+</pre></div>
+
+
+<p>If the system <code>myhost</code> actually hosts some of your code on git bare repositories, you may be constrained to use a single SSH alias and adapt the SSH configuration depending on the network you are connected to so that you can still perform <code>pull</code> and <code>push</code> operations. However, you may want to avoid modifying your configuration many times a day.</p>
+<p>To avoid having to make these changes manually, here is a little tool, ProxyCommandResolver (pcr), which will pick up the correct <code>ProxyCommand</code> to use for you. pcr uses a configuration file that make an association between an SSH Host alias, multiple <code>ProxyCommand</code> and your current connection parameters (Wifi access point name for example) and returns the <code>ProxyCommand</code> to be used.</p>
+<p>So far, the connection parameters supported by pcr are the default routing interface, your wifi ESSID, your NetworkManager connection name or your current IP address.</p>
+<p>The tool consists of:</p>
+<ul>
+<li>
+<p><a href="code/pcr/pcr.py">The pcr.py python script</a></p>
+</li>
+<li>
+<p><a href="code/pcr/pcr.xml">An XML based configuration file</a></p>
+</li>
+</ul>
+<p>The corresponding SSH configuration to make use of this script is the following. One of the nice feature of the proxy command parameter is that it allows to take the output of a command as a parameter with the following syntax.</p>
+<div class="highlight"><pre>Host foo
+ProxyCommand <span class="k">$(</span>/path/to/pcr.py %h<span class="k">)</span> <span class="c"># for example $HOME/.ssh/pcr.py</span>
+</pre></div>
+
+
+<p>The configuration elements works as follow:
+ * <code>ProxyHost</code>: correspond to the configuration that apply to a SSH Host alias.</p>
+<ul>
+<li>
+<p><code>Host</code>: the Host Alias as defined in the SSH configuration</p>
+</li>
+<li>
+<p><code>Proxy</code>: Delimits a ProxyCommand and the conditions that lead to this specific ProxyCommand</p>
+</li>
+<li>
+<p><code>DefaultNetworkInterfaceName</code>: the name of the default network interface that must be matched</p>
+</li>
+<li>
+<p><code>LocalConnectionName</code>: either the ESSID or the name of the connection defined in the <code>NetworkManager</code>.</p>
+</li>
+<li>
+<p><code>DefaultNetworkIPAddress</code>: the IP address of your default interface.</p>
+</li>
+</ul>
+<p>A <code>Condition</code> section defines one or multiple conditions that must apply to chose a specific <code>ProxyCommand</code>. A <code>Proxy</code> that have the <code>fallback="yes"</code> attribute is used in case of any of the previous Proxy's Condition(s) worked.</p>
+<p>This script is designed to work on Linux and has been tested on Ubuntu LTS only. Use at your own risks!</p>
+<p>I hope it will help you to save some of your SSH configuration edition time ;)</p>
+  </div><!-- /.entry-content -->
+</section>
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">gsallesl.github.io
+                </address><!-- /#about -->
+        </footer><!-- /#contentinfo -->
+</body>
+</html>

@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<Config>
+	<ProxyHost>
+		<Host>myworkhost</Host>
+		<Proxy>
+			<ProxyCommand>nc IPAddress 22</ProxyCommand>
+			<Condition>
+				<DefaultNetworkInterfaceName>wlan0</DefaultNetworkInterfaceName>
+				<LocalConnectionName>work1</LocalConnectionName>
+			</Condition>
+			<Condition>
+				<DefaultNetworkInterfaceName>wlan0</DefaultNetworkInterfaceName>
+				<LocalConnectionName>work2</LocalConnectionName>
+			</Condition>
+			<Condition>
+				<DefaultNetworkInterfaceName>eth0</DefaultNetworkInterfaceName>
+				<LocalConnectionName>lab_wired</LocalConnectionName>
+			</Condition>
+		</Proxy>
+		<Proxy>
+			<ProxyCommand>ssh local_IP_address -W localhost:3456</ProxyCommand>
+			<Condition>
+				<LocalConnectionName>Home</LocalConnectionName>
+			</Condition>
+		</Proxy>
+		<Proxy fallback="true">
+			<ProxyCommand>ssh public_IP_address -W localhost:3456</ProxyCommand>
+		</Proxy>
+	</ProxyHost>
+	<ProxyHost>
+		<Host>mypersohost</Host>
+		<Proxy>
+			<ProxyCommand>nc someipaddress 22</ProxyCommand>
+			<Condition>
+				<LocalConnectionName>Home</LocalConnectionName>
+			</Condition>
+		</Proxy>
+		<Proxy fallback="true">
+			<ProxyCommand>ssh public_IP_address -W mysecondhost:22</ProxyCommand>
+		</Proxy>
+	</ProxyHost>
+</Config>
+
