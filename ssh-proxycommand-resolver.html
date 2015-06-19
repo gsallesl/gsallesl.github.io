@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-          <title>gsallesl.github.io</title>
-        <meta charset="utf-8" />
+          <meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="system, network, security">
+	<meta name="author" content="gsallesl">
+	<link rel="icon" href="./theme/favicon.ico">
 
+        <title>gsallesl.github.io</title>
 
+	<link href="./theme/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="./theme/css/blog.css" rel="stylesheet" />
 	<link href="./theme/css/pygments/emacs.css" rel="stylesheet" />
-	<link href="./theme/css/style.css" rel="stylesheet" />
-        <link href="/feed" type="application/atom+xml" rel="alternate" title="gsallesl.github.io Full Atom Feed" />
+        <link href="https://gsallesl.github.io/feed" type="application/atom+xml" rel="alternate" title="gsallesl.github.io Full Atom Feed" />
 
 
 
@@ -18,32 +24,36 @@
 
 </head>
 
-<body id="index" class="home">
-        <header id="banner" class="body">
-                <h1><a href="./">gsallesl.github.io <strong></strong></a></h1>
-        </header><!-- /#banner -->
-        <nav id="menu"><ul>
-        </ul></nav><!-- /#menu -->
-<section id="content" class="body">
-  <header>
-    <h2 class="entry-title">
-      <a href="./ssh-proxycommand-resolver.html" rel="bookmark"
-         title="Permalink to SSH ProxyCommand Resolver">SSH ProxyCommand Resolver</a></h2>
- 
-  </header>
-  <footer class="post-info">
-    <abbr class="published" title="2015-05-12T10:20:00+02:00">
-      Tue 12 May 2015
-    </abbr>
-    <abbr class="modified" title="2015-05-12T19:30:00+02:00">
-      (last modified 12/05/2015)
-    </abbr>
-    <address class="vcard author">
-      By           <a class="url fn" href="./">Gabriel</a>
-    </address>
-  </footer><!-- /.post-info -->
-  <div class="entry-content">
-    <p>SSH ProxyResolver dynamically determines the <code>ProxyCommand</code> to use for a SSH <code>Host</code> alias based on your current network connection and a configuration you provide.</p>
+<body>
+<div class="container">
+
+	<div class="blog-header">
+		<h1 class="blog-title"><a href="./">gsallesl.github.io</a></h1>
+		<p class="lead blog-description"></p>
+	</div>
+
+	<div class="row">
+
+		<div class="col-sm-8 blog-main">
+			<nav id="menu"><ul>
+			</ul></nav><!-- /#menu -->
+<div class="blog-post">
+	<h2 class="blog-post-title"><a href="./ssh-proxycommand-resolver.html" rel="bookmark"
+			title="Permalink to SSH ProxyCommand Resolver">SSH ProxyCommand Resolver</a></h2>
+	
+	<div class="blog-post-meta">
+	<abbr class="published" title="2015-05-12T10:20:00+02:00">
+		Tue 12 May 2015
+	</abbr>
+	<abbr class="modified" title="2015-05-12T19:30:00+02:00">
+		(last modified 12/05/2015)
+	</abbr>
+	<address class="vcard author">
+		By 		<a class="url fn" href="./">Gabriel</a>
+	</address>
+	</div>
+	<div class="entry-content">
+		<p>SSH ProxyResolver dynamically determines the <code>ProxyCommand</code> to use for a SSH <code>Host</code> alias based on your current network connection and a configuration you provide.</p>
 <p>SSH ProxyCommand configuration parameter provides a great way to nicely access a computer not directly accessible on the internet with a simple command.</p>
 <p>This configuration parameter is particularly useful on a laptop SSH configuration to access such a system. You may have to change this parameter when switching between networks: </p>
 <ul>
@@ -119,11 +129,38 @@ ProxyCommand <span class="k">$(</span>/path/to/pcr.py %h<span class="k">)</span>
 <p>A <code>Condition</code> section defines one or multiple conditions that must apply to chose a specific <code>ProxyCommand</code>. A <code>Proxy</code> that have the <code>fallback="yes"</code> attribute is used in case of any of the previous Proxy's Condition(s) worked.</p>
 <p>This script is designed to work on Linux and has been tested on Ubuntu LTS only. Use at your own risks!</p>
 <p>I hope it will help you to save some of your SSH configuration edition time ;)</p>
-  </div><!-- /.entry-content -->
-</section>
-        <footer id="contentinfo" class="body">
-                <address id="about" class="vcard body">gsallesl.github.io
-                </address><!-- /#about -->
-        </footer><!-- /#contentinfo -->
+	</div><!-- /.entry-content -->
+
+</div><!-- /.blog-post -->
+		</div><!-- /.blog-main -->
+
+		<div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+			<div class="sidebar-module sidebar-module-inset">
+				<h4>About</h4>
+				<p>My online clipboard.</p>
+			</div>
+			<div class="sidebar-module">
+				<h4>Content</h4>
+				<ol class="list-unstyled">
+					<li><a href="./index.html">Index</a></li>
+					<li><a type="application/rss+xml" href="./feed">RSS feed</a></li>
+				</ol>
+			</div>
+			<div class="sidebar-module">
+				<h4>Links</h4>
+				<ol class="list-unstyled">
+					<li><a href="https://github.com/gsallesl">GitHub</a></li>
+				</ol>
+			</div>
+		</div><!-- /.blog-sidebar -->
+
+	</div><!-- /.row -->
+
+</div><!-- /.container -->
+
+<footer class="blog-footer">
+	<address id="about" class="vcard body">gsallesl.github.io</address><!-- /#about -->
+	<p><a href="#">Back to top</a></p>
+</footer>
 </body>
 </html>
