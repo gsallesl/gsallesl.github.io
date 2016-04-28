@@ -59,7 +59,7 @@
 <ul>
 <li>When connected to the same network as <code>myhost</code>:</li>
 </ul>
-<div class="highlight"><pre><span class="c"># .ssh/config</span>
+<div class="highlight"><pre><span></span><span class="c1"># .ssh/config</span>
 Host myhost
 HostName IPAddress
 </pre></div>
@@ -68,7 +68,7 @@ HostName IPAddress
 <ul>
 <li>When proxying via a server facing the internet that can access <code>myhost</code>:</li>
 </ul>
-<div class="highlight"><pre><span class="c"># .ssh/config</span>
+<div class="highlight"><pre><span></span><span class="c1"># .ssh/config</span>
 Host myhost
 ProxyCommand ssh internet_facing_server_IP -W IPAddress:some_port
 </pre></div>
@@ -78,12 +78,12 @@ ProxyCommand ssh internet_facing_server_IP -W IPAddress:some_port
 <li>When using a meeting point on another server, for example when the system facing the internet and on the same network as <code>myhost</code> is down:</li>
 </ul>
 <p>On my host:</p>
-<div class="highlight"><pre>ssh -NR 2345:localhost:22  internet_facing_server2_IP
+<div class="highlight"><pre><span></span>ssh -NR 2345:localhost:22  internet_facing_server2_IP
 </pre></div>
 
 
 <p>On the client:</p>
-<div class="highlight"><pre><span class="c"># .ssh/config</span>
+<div class="highlight"><pre><span></span><span class="c1"># .ssh/config</span>
 Host myhost
 ProxyCommand ssh internet_facing_server2_IP -W localhost:2345
 </pre></div>
@@ -102,8 +102,8 @@ ProxyCommand ssh internet_facing_server2_IP -W localhost:2345
 </li>
 </ul>
 <p>The corresponding SSH configuration to make use of this script is the following. One of the nice feature of the proxy command parameter is that it allows to take the output of a command as a parameter with the following syntax.</p>
-<div class="highlight"><pre>Host foo
-ProxyCommand <span class="k">$(</span>/path/to/pcr.py %h<span class="k">)</span> <span class="c"># for example $HOME/.ssh/pcr.py</span>
+<div class="highlight"><pre><span></span>Host foo
+ProxyCommand <span class="k">$(</span>/path/to/pcr.py %h<span class="k">)</span> <span class="c1"># for example $HOME/.ssh/pcr.py</span>
 </pre></div>
 
 

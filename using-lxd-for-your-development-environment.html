@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+          <meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="system, network, security">
+	<meta name="author" content="gsallesl">
+	<link rel="icon" href="./theme/favicon.ico">
+
+        <title>gsallesl.github.io</title>
+
+	<link href="./theme/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="./theme/css/blog.css" rel="stylesheet" />
+	<link href="./theme/css/pygments/emacs.css" rel="stylesheet" />
+        <link href="https://gsallesl.github.io/feed" type="application/atom+xml" rel="alternate" title="gsallesl.github.io Full Atom Feed" />
+
+
+
+    <meta name="tags" content="admin" />
+    <meta name="tags" content="dev" />
+
+</head>
+
+<body>
+<div class="container">
+
+	<div class="blog-header">
+		<h1 class="blog-title"><a href="./">gsallesl.github.io</a></h1>
+		<p class="lead blog-description"></p>
+	</div>
+
+	<div class="row">
+
+		<div class="col-sm-8 blog-main">
+			<nav id="menu"><ul>
+			</ul></nav><!-- /#menu -->
+<div class="blog-post">
+	<h2 class="blog-post-title"><a href="./using-lxd-for-your-development-environment.html" rel="bookmark"
+			title="Permalink to Using LXD for your development environment">Using LXD for your development environment</a></h2>
+	
+	<div class="blog-post-meta">
+	<abbr class="published" title="2016-04-24T10:20:00+02:00">
+		Sun 24 April 2016
+	</abbr>
+	<abbr class="modified" title="2016-04-24T10:20:00+02:00">
+		(last modified 24/04/2016)
+	</abbr>
+	<address class="vcard author">
+		By 		<a class="url fn" href="./">Gabriel</a>
+	</address>
+	</div>
+	<div class="entry-content">
+		<p><a href="https://linuxcontainers.org/lxd/">LXD linux containers</a> provides an interesting solution to isolate specific project development environments (python, android) from your host system.</p>
+<p>The motivations for isolating your project development environments are well known and projects such as <a href="https://www.vagrantup.com/docs/why-vagrant/">Vagrant</a> already provide dev environment on top of Virtualbox, Hyper-V or Docker.</p>
+<p>However, if you don't need all the functionalities of Vagrant and just look to get a simple and probably more permanent setup, this blog post is for you.</p>
+<p>My requirements for my dev environment are as follow:</p>
+<ul>
+<li>
+<p>My dev tools (e.g.: compilers) must be running fast, if possible without the overhead added by a virtualization solution such as VirtualBox or Qemu.</p>
+</li>
+<li>
+<p>My code must be accessible on my host: I want to be able to edit my code on my host and to have my changes already commited to my dev environment (e.g.: I don't want to have to copy my code from my host to my dev environment, especially when working on big projects such as the linux kernel or the AOSP framework).</p>
+</li>
+</ul>
+<p>LXD provides an interesting solution: </p>
+<ul>
+<li>Nearly native performances, or at least performances not as bad as they are when compiling in a virtual machine.</li>
+<li>Easily accessible code: shared folders between the containers and the host use bind mounts. This architecture can be leveraged to editing the code from your host and only compile from the container.</li>
+</ul>
+<p>Here is what my setup looks like:</p>
+<h2>Setup</h2>
+<div class="highlight"><pre><span></span><span class="c1"># - Install and configure lxd (one time operation)</span>
+sudo apt-get install lxd
+sudo lxd init
+
+<span class="c1"># - Create a new environment</span>
+<span class="c1"># for example ubuntu version 14.04 and I call the container ubuntu-dev</span>
+lxc launch ubuntu:14.04 ubuntu-dev
+
+<span class="c1"># - Create a user that corresponds to the uid given</span>
+<span class="c1"># to the containers file (one time operation)</span>
+
+<span class="c1"># First lookup the uid that corresponds to the container</span>
+sudo ls -la /var/lib/lxd/containers/ubuntu-dev/rootfs
+<span class="o">[</span>output<span class="o">]</span> drwxr-xr-x  <span class="m">24</span> <span class="m">165536</span> <span class="m">165536</span> <span class="m">4096</span> Apr <span class="m">21</span> 20:26 .
+<span class="o">[</span>output<span class="o">]</span> drwxr-xr-x+  <span class="m">4</span> <span class="m">165536</span> <span class="m">165536</span> <span class="m">4096</span> Apr <span class="m">21</span> 19:13 ..
+<span class="o">[</span>output<span class="o">]</span> drwxr-xr-x   <span class="m">2</span> <span class="m">165536</span> <span class="m">165536</span> <span class="m">4096</span> Apr <span class="m">20</span> 10:57 bin
+<span class="o">[</span>output<span class="o">]</span> ...
+
+<span class="c1"># Create the user using the container files uid (one time operation)</span>
+sudo adduser --home<span class="o">=</span>/dev/null --no-create-home --gecos <span class="s2">&quot;&quot;</span> --uid <span class="m">166536</span> --disabled-login --shell /bin/false lxduser
+
+<span class="c1"># - Create a directory that will contain the code shared </span>
+<span class="c1"># between the host and the containers (one time operation)</span>
+sudo mkdir /home/projects
+chown -R lxduser:lxduser /home/projects
+
+<span class="c1"># - Mount a filesystem outside of the container as the home </span>
+<span class="c1"># for the container user (ubuntu by default)</span>
+lxc config device add ubuntu-dev projects disk <span class="nv">source</span><span class="o">=</span>/home/projects <span class="nv">path</span><span class="o">=</span>/home/ubuntu
+
+<span class="c1"># - Restart the container to apply the changes</span>
+lxd restart ubuntu-dev
+
+<span class="c1"># - Change ownership of the files in your containers</span>
+lxc <span class="nb">exec</span> ubuntu-dev -- chown -R ubuntu:ubuntu /home/ubuntu
+
+<span class="c1"># - Mount /home/project, which currently belongs to lxduser</span>
+<span class="c1"># in your host user (gsalles) home tree so you can edit your code locally</span>
+<span class="c1"># We are going to use bindfs for this operation:</span>
+<span class="c1"># we use the mapping feature between the lxd container user (lxduser) </span>
+<span class="c1"># and your host user (gsallesl)</span>
+sudo mount -t fuse.bindfs /home/projects /home/gsallesl/projects -o <span class="nv">map</span><span class="o">=</span>lxduser/gsallesl:@lxduser/@gsallesl
+
+<span class="c1"># An fstab entry looks as follow to make the mount automatic at startup</span>
+/home/projects  /home/gsallesl/projects     fuse.bindfs     <span class="nv">map</span><span class="o">=</span>lxduser/gsallesl:@lxduser/@gsallesl   <span class="m">0</span>       0
+</pre></div>
+	</div><!-- /.entry-content -->
+
+</div><!-- /.blog-post -->
+		</div><!-- /.blog-main -->
+
+		<div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+			<div class="sidebar-module sidebar-module-inset">
+				<h4>About</h4>
+				<p>My online clipboard.</p>
+			</div>
+			<div class="sidebar-module">
+				<h4>Content</h4>
+				<ol class="list-unstyled">
+					<li><a href="./index.html">Index</a></li>
+					<li><a type="application/rss+xml" href="./feed">RSS feed</a></li>
+				</ol>
+			</div>
+			<div class="sidebar-module">
+				<h4>Links</h4>
+				<ol class="list-unstyled">
+					<li><a href="https://github.com/gsallesl">GitHub</a></li>
+				</ol>
+			</div>
+		</div><!-- /.blog-sidebar -->
+
+	</div><!-- /.row -->
+
+</div><!-- /.container -->
+
+<footer class="blog-footer">
+	<address id="about" class="vcard body">gsallesl.github.io</address><!-- /#about -->
+	<p><a href="#">Back to top</a></p>
+</footer>
+</body>
+</html>
