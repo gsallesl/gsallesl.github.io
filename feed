@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>gsallesl.github.io</title><link href="https://gsallesl.github.io/" rel="alternate"></link><link href="https://gsallesl.github.io/feed" rel="self"></link><id>https://gsallesl.github.io/</id><updated>2016-04-24T10:20:00+02:00</updated><entry><title>Using LXD for your development environment</title><link href="https://gsallesl.github.io/using-lxd-for-your-development-environment.html" rel="alternate"></link><published>2016-04-24T10:20:00+02:00</published><author><name>Gabriel</name></author><id>tag:gsallesl.github.io,2016-04-24:using-lxd-for-your-development-environment.html</id><summary type="html">&lt;p&gt;&lt;a href="https://linuxcontainers.org/lxd/"&gt;LXD linux containers&lt;/a&gt; provides an interesting solution to isolate specific project development environments (python, android) from your host system.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>gsallesl.github.io</title><link href="https://gsallesl.github.io/" rel="alternate"></link><link href="https://gsallesl.github.io/feed" rel="self"></link><id>https://gsallesl.github.io/</id><updated>2016-05-05T00:20:00+02:00</updated><entry><title>Using LXD for your development environment</title><link href="https://gsallesl.github.io/using-lxd-for-your-development-environment.html" rel="alternate"></link><published>2016-05-05T00:20:00+02:00</published><author><name>Gabriel</name></author><id>tag:gsallesl.github.io,2016-04-24:using-lxd-for-your-development-environment.html</id><summary type="html">&lt;p&gt;&lt;a href="https://linuxcontainers.org/lxd/"&gt;LXD linux containers&lt;/a&gt; provides an interesting solution to isolate project development environments (python, android) from your host system.&lt;/p&gt;
 &lt;p&gt;The motivations for isolating your project development environments are well known and projects such as &lt;a href="https://www.vagrantup.com/docs/why-vagrant/"&gt;Vagrant&lt;/a&gt; already provide dev environment on top of Virtualbox, Hyper-V or Docker.&lt;/p&gt;
 &lt;p&gt;However, if you don't need all the functionalities of Vagrant and just look to get a simple and probably more permanent setup, this blog post is for you.&lt;/p&gt;
 &lt;p&gt;My requirements for my dev environment are as follow:&lt;/p&gt;
@@ -11,12 +11,12 @@
 &lt;p&gt;My code must be accessible on my host: I want to be able to edit my code on my host and to have my changes already commited to my dev environment (e.g.: I don't want to have to copy my code from my host to my dev environment, especially when working on big projects such as the linux kernel or the AOSP framework).&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;LXD provides an interesting solution: &lt;/p&gt;
+&lt;p&gt;LXD provides interesting features for this use case: &lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;Nearly native performances, or at least performances not as bad as they are when compiling in a virtual machine.&lt;/li&gt;
+&lt;li&gt;Nearly native performances, or at least performances not as bad as they are when compiling in a virtual machine, thanks to the linux namespace system LXD is build on top of.&lt;/li&gt;
 &lt;li&gt;Easily accessible code: shared folders between the containers and the host use bind mounts. This architecture can be leveraged to editing the code from your host and only compile from the container.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Here is what my setup looks like:&lt;/p&gt;
+&lt;p&gt;Here is what my setup looks like on a ubuntu system:&lt;/p&gt;
 &lt;h2&gt;Setup&lt;/h2&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# - Install and configure lxd (one time operation)&lt;/span&gt;
 sudo apt-get install lxd
@@ -37,7 +37,7 @@ sudo ls -la /var/lib/lxd/containers/ubuntu-dev/rootfs
 &lt;span class="o"&gt;[&lt;/span&gt;output&lt;span class="o"&gt;]&lt;/span&gt; ...
 
 &lt;span class="c1"&gt;# Create the user using the container files uid (one time operation)&lt;/span&gt;
-sudo adduser --home&lt;span class="o"&gt;=&lt;/span&gt;/dev/null --no-create-home --gecos &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt; --uid &lt;span class="m"&gt;166536&lt;/span&gt; --disabled-login --shell /bin/false lxduser
+sudo adduser --home&lt;span class="o"&gt;=&lt;/span&gt;/dev/null --no-create-home --gecos &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt; --uid &lt;span class="m"&gt;166536&lt;/span&gt; --disabled-password --shell /bin/false lxduser
 
 &lt;span class="c1"&gt;# - Create a directory that will contain the code shared &lt;/span&gt;
 &lt;span class="c1"&gt;# between the host and the containers (one time operation)&lt;/span&gt;
@@ -63,6 +63,9 @@ sudo mount -t fuse.bindfs /home/projects /home/gsallesl/projects -o &lt;span cla
 
 &lt;span class="c1"&gt;# An fstab entry looks as follow to make the mount automatic at startup&lt;/span&gt;
 /home/projects  /home/gsallesl/projects     fuse.bindfs     &lt;span class="nv"&gt;map&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;lxduser/gsallesl:@lxduser/@gsallesl   &lt;span class="m"&gt;0&lt;/span&gt;       0
+
+&lt;span class="c1"&gt;# (optional) Hide lxduser user from the lightdm login screen on ubuntu:&lt;/span&gt;
+&lt;span class="c1"&gt;# http://askubuntu.com/questions/92349/how-do-i-hide-a-particular-user-from-the-login-screen/575390#575390&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;</summary><category term="admin"></category><category term="dev"></category></entry><entry><title>SSH ProxyCommand Resolver</title><link href="https://gsallesl.github.io/ssh-proxycommand-resolver.html" rel="alternate"></link><published>2015-05-12T19:30:00+02:00</published><author><name>Gabriel</name></author><id>tag:gsallesl.github.io,2015-05-12:ssh-proxycommand-resolver.html</id><summary type="html">&lt;p&gt;SSH ProxyResolver dynamically determines the &lt;code&gt;ProxyCommand&lt;/code&gt; to use for a SSH &lt;code&gt;Host&lt;/code&gt; alias based on your current network connection and a configuration you provide.&lt;/p&gt;
 &lt;p&gt;SSH ProxyCommand configuration parameter provides a great way to nicely access a computer not directly accessible on the internet with a simple command.&lt;/p&gt;
 &lt;p&gt;This configuration parameter is particularly useful on a laptop SSH configuration to access such a system. You may have to change this parameter when switching between networks: &lt;/p&gt;

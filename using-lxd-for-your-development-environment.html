@@ -43,15 +43,15 @@
 	<abbr class="published" title="2016-04-24T10:20:00+02:00">
 		Sun 24 April 2016
 	</abbr>
-	<abbr class="modified" title="2016-04-24T10:20:00+02:00">
-		(last modified 24/04/2016)
+	<abbr class="modified" title="2016-05-05T00:20:00+02:00">
+		(last modified 05/05/2016)
 	</abbr>
 	<address class="vcard author">
 		By 		<a class="url fn" href="./">Gabriel</a>
 	</address>
 	</div>
 	<div class="entry-content">
-		<p><a href="https://linuxcontainers.org/lxd/">LXD linux containers</a> provides an interesting solution to isolate specific project development environments (python, android) from your host system.</p>
+		<p><a href="https://linuxcontainers.org/lxd/">LXD linux containers</a> provides an interesting solution to isolate project development environments (python, android) from your host system.</p>
 <p>The motivations for isolating your project development environments are well known and projects such as <a href="https://www.vagrantup.com/docs/why-vagrant/">Vagrant</a> already provide dev environment on top of Virtualbox, Hyper-V or Docker.</p>
 <p>However, if you don't need all the functionalities of Vagrant and just look to get a simple and probably more permanent setup, this blog post is for you.</p>
 <p>My requirements for my dev environment are as follow:</p>
@@ -63,12 +63,12 @@
 <p>My code must be accessible on my host: I want to be able to edit my code on my host and to have my changes already commited to my dev environment (e.g.: I don't want to have to copy my code from my host to my dev environment, especially when working on big projects such as the linux kernel or the AOSP framework).</p>
 </li>
 </ul>
-<p>LXD provides an interesting solution: </p>
+<p>LXD provides interesting features for this use case: </p>
 <ul>
-<li>Nearly native performances, or at least performances not as bad as they are when compiling in a virtual machine.</li>
+<li>Nearly native performances, or at least performances not as bad as they are when compiling in a virtual machine, thanks to the linux namespace system LXD is build on top of.</li>
 <li>Easily accessible code: shared folders between the containers and the host use bind mounts. This architecture can be leveraged to editing the code from your host and only compile from the container.</li>
 </ul>
-<p>Here is what my setup looks like:</p>
+<p>Here is what my setup looks like on a ubuntu system:</p>
 <h2>Setup</h2>
 <div class="highlight"><pre><span></span><span class="c1"># - Install and configure lxd (one time operation)</span>
 sudo apt-get install lxd
@@ -89,7 +89,7 @@ sudo ls -la /var/lib/lxd/containers/ubuntu-dev/rootfs
 <span class="o">[</span>output<span class="o">]</span> ...
 
 <span class="c1"># Create the user using the container files uid (one time operation)</span>
-sudo adduser --home<span class="o">=</span>/dev/null --no-create-home --gecos <span class="s2">&quot;&quot;</span> --uid <span class="m">166536</span> --disabled-login --shell /bin/false lxduser
+sudo adduser --home<span class="o">=</span>/dev/null --no-create-home --gecos <span class="s2">&quot;&quot;</span> --uid <span class="m">166536</span> --disabled-password --shell /bin/false lxduser
 
 <span class="c1"># - Create a directory that will contain the code shared </span>
 <span class="c1"># between the host and the containers (one time operation)</span>
@@ -115,6 +115,9 @@ sudo mount -t fuse.bindfs /home/projects /home/gsallesl/projects -o <span class=
 
 <span class="c1"># An fstab entry looks as follow to make the mount automatic at startup</span>
 /home/projects  /home/gsallesl/projects     fuse.bindfs     <span class="nv">map</span><span class="o">=</span>lxduser/gsallesl:@lxduser/@gsallesl   <span class="m">0</span>       0
+
+<span class="c1"># (optional) Hide lxduser user from the lightdm login screen on ubuntu:</span>
+<span class="c1"># http://askubuntu.com/questions/92349/how-do-i-hide-a-particular-user-from-the-login-screen/575390#575390</span>
 </pre></div>
 	</div><!-- /.entry-content -->
 
