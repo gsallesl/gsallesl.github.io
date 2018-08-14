@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+          <meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="system, network, security">
+	<meta name="author" content="gsallesl">
+	<link rel="icon" href="./theme/favicon.ico">
+
+        <title>gsallesl.github.io</title>
+
+	<link href="./theme/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="./theme/css/blog.css" rel="stylesheet" />
+	<link href="./theme/css/pygments/emacs.css" rel="stylesheet" />
+        <link href="https://gsallesl.github.io/feed" type="application/atom+xml" rel="alternate" title="gsallesl.github.io Full Atom Feed" />
+
+
+
+    <meta name="tags" content="admin" />
+    <meta name="tags" content="dev" />
+
+</head>
+
+<body>
+<div class="container">
+
+	<div class="blog-header">
+		<h1 class="blog-title"><a href="./">gsallesl.github.io</a></h1>
+		<p class="lead blog-description"></p>
+	</div>
+
+	<div class="row">
+
+		<div class="col-sm-8 blog-main">
+			<nav id="menu"><ul>
+			</ul></nav><!-- /#menu -->
+<div class="blog-post">
+	<h2 class="blog-post-title"><a href="./using-lxd-for-your-development-environment-with-some-improvements.html" rel="bookmark"
+			title="Permalink to Using LXD for your development environment, with some improvements">Using LXD for your development environment, with some improvements</a></h2>
+	
+	<div class="blog-post-meta">
+	<abbr class="published" title="2018-08-14T10:20:00+02:00">
+		Tue 14 August 2018
+	</abbr>
+	<abbr class="modified" title="2018-08-14T10:20:00+02:00">
+		(last modified 14/08/2018)
+	</abbr>
+	<address class="vcard author">
+		By 		<a class="url fn" href="./">Gabriel</a>
+	</address>
+	</div>
+	<div class="entry-content">
+		<p>I will focus on the creation of a container dedicated to android development. With respect to my <a href="https://gsallesl.github.io/using-lxd-for-your-development-environment.html">previous entry on the topic</a> this setup simplifies the directory sharing between the host and the container.</p>
+<p>My updated requirements are:</p>
+<ul>
+<li>the dev tools will be installed only on the container</li>
+<li>the source code should be accessible both from the host and the guest</li>
+<li>we setup a local mirror for the android repo to save space as I am working on several versions/platforms</li>
+</ul>
+<p>This time we consider the use of a privileged container to ease the directory sharing process between host and container.</p>
+<p>Here is what my setup looks like on a ubuntu system:</p>
+<h2>Container setup</h2>
+<div class="highlight"><pre><span></span><span class="c1"># - Install and configure lxd (one time operation)</span>
+sudo apt-get install lxd
+sudo lxd init
+
+<span class="c1"># - Create a new environment</span>
+<span class="c1"># for example ubuntu version 16.04 and I call the container ubuntu-1604</span>
+lxc launch ubuntu:16.04 ubuntu-1604
+
+<span class="c1"># - Create a directory that will contain the code shared </span>
+<span class="c1"># between the host and the containers (one time operation)</span>
+mkdir <span class="si">${</span><span class="nv">HOME</span><span class="si">}</span>/projects
+
+<span class="c1"># - Mount the project folder as the container user (ubuntu by default) home </span>
+lxc config device add ubuntu-1604 projects disk <span class="nv">source</span><span class="o">=</span>/home/projects <span class="nv">path</span><span class="o">=</span>/home/ubuntu
+
+<span class="c1"># - Create a directory that will contain the android mirror</span>
+<span class="c1"># !!! This directory shouldn&#39;t be user specific (i.e. have the username is the path)</span>
+<span class="c1"># !!! as the the container user might be different from the host user</span>
+sudo mkdir /home/aosp-mirror
+
+<span class="c1"># - Mount the project folder as the container user (ubuntu by default) home </span>
+lxc config device add ubuntu-1604 aosp-mirror disk <span class="nv">source</span><span class="o">=</span>/home/aosp-mirror <span class="nv">path</span><span class="o">=</span>/home/aosp-mirror
+
+<span class="c1"># - Make the container a priviledged container</span>
+<span class="c1"># This is required in order to have the correct uid mapping between your guest container and your host system.</span>
+<span class="c1"># cf previous blog entry for alternative</span>
+lxc config <span class="nb">set</span> ubuntu-1604 security.privileged <span class="nb">true</span>
+
+<span class="c1"># - Restart the container to apply the changes</span>
+lxd restart ubuntu-1604
+</pre></div>
+
+
+<p>The next steps consist in:
+<em> cloning the android mirror from the container
+</em> repo sync a version to work on and use reference to the local mirror to save space</p>
+<h2>Android mirror setup</h2>
+<div class="highlight"><pre><span></span><span class="c1"># Cloning the mirror</span>
+<span class="nb">cd</span> /home/aosp-mirror
+repo init -u https://android.googlesource.com/mirror/manifest --mirror
+repo sync
+
+<span class="c1"># Sync a working dir against the local repo.</span>
+<span class="c1"># Use --reference to link the git refs to the mirror</span>
+<span class="c1"># (optional) Sync only a branch (-c option). Might be dangerous if you want to commit code later on.</span>
+<span class="nb">cd</span> ~
+mkdir aosp-working-dir
+<span class="nb">cd</span> !$
+repo init --reference<span class="o">=</span>/home/aosp-mirror -u /home/aosp-mirror/platform/manifest.git -b android-5.0.1_r1
+repo sync -j<span class="k">$(</span>nproc<span class="k">)</span> -c
+</pre></div>
+
+
+<p>One advantage of this lxc setup is that the local git references can be resolved both from the host and the container.</p>
+	</div><!-- /.entry-content -->
+
+</div><!-- /.blog-post -->
+		</div><!-- /.blog-main -->
+
+		<div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+			<div class="sidebar-module sidebar-module-inset">
+				<h4>About</h4>
+				<p>My online clipboard.</p>
+			</div>
+			<div class="sidebar-module">
+				<h4>Content</h4>
+				<ol class="list-unstyled">
+					<li><a href="./index.html">Index</a></li>
+					<li><a type="application/rss+xml" href="./feed">RSS feed</a></li>
+				</ol>
+			</div>
+			<div class="sidebar-module">
+				<h4>Links</h4>
+				<ol class="list-unstyled">
+					<li><a href="https://github.com/gsallesl">GitHub</a></li>
+				</ol>
+			</div>
+		</div><!-- /.blog-sidebar -->
+
+	</div><!-- /.row -->
+
+</div><!-- /.container -->
+
+<footer class="blog-footer">
+	<address id="about" class="vcard body">gsallesl.github.io</address><!-- /#about -->
+	<p><a href="#">Back to top</a></p>
+</footer>
+</body>
+</html>
