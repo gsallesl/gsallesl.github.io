@@ -53,7 +53,7 @@
 	<div class="entry-content">
 		<p><a href="https://linuxcontainers.org/lxd/">LXD linux containers</a> provides an interesting solution to isolate project development environments (python, android) from your host system.</p>
 <p>The motivations for isolating your project development environments are well known and projects such as <a href="https://www.vagrantup.com/docs/why-vagrant/">Vagrant</a> already provide dev environment on top of Virtualbox, Hyper-V or Docker.</p>
-<p>However, if you don't need all the functionalities of Vagrant and just look to get a simple and probably more permanent setup, this blog post is for you.</p>
+<p>However, if you don't need all the functionalities of Vagrant and just look to get a simple and probably more permanent setup, this blog post is for you. <a href="https://roots.io/linux-containers-lxd-as-an-alternative-to-virtualbox-for-wordpress-development/">This article</a> describes how to use LXD for wordpress development. In this article we will focus on improving the accessibility to the code.</p>
 <p>My requirements for my dev environment are as follow:</p>
 <ul>
 <li>
@@ -83,9 +83,9 @@ lxc launch ubuntu:14.04 ubuntu-dev
 
 <span class="c1"># First lookup the uid that corresponds to the container</span>
 sudo ls -la /var/lib/lxd/containers/ubuntu-dev/rootfs
-<span class="o">[</span>output<span class="o">]</span> drwxr-xr-x  <span class="m">24</span> <span class="m">165536</span> <span class="m">165536</span> <span class="m">4096</span> Apr <span class="m">21</span> 20:26 .
-<span class="o">[</span>output<span class="o">]</span> drwxr-xr-x+  <span class="m">4</span> <span class="m">165536</span> <span class="m">165536</span> <span class="m">4096</span> Apr <span class="m">21</span> 19:13 ..
-<span class="o">[</span>output<span class="o">]</span> drwxr-xr-x   <span class="m">2</span> <span class="m">165536</span> <span class="m">165536</span> <span class="m">4096</span> Apr <span class="m">20</span> 10:57 bin
+<span class="o">[</span>output<span class="o">]</span> drwxr-xr-x  <span class="m">24</span> <span class="m">165536</span> <span class="m">165536</span> <span class="m">4096</span> Apr <span class="m">21</span> <span class="m">20</span>:26 .
+<span class="o">[</span>output<span class="o">]</span> drwxr-xr-x+  <span class="m">4</span> <span class="m">165536</span> <span class="m">165536</span> <span class="m">4096</span> Apr <span class="m">21</span> <span class="m">19</span>:13 ..
+<span class="o">[</span>output<span class="o">]</span> drwxr-xr-x   <span class="m">2</span> <span class="m">165536</span> <span class="m">165536</span> <span class="m">4096</span> Apr <span class="m">20</span> <span class="m">10</span>:57 bin
 <span class="o">[</span>output<span class="o">]</span> ...
 
 <span class="c1"># Create the user using the container files uid (one time operation)</span>
@@ -114,7 +114,7 @@ lxc <span class="nb">exec</span> ubuntu-dev -- chown -R ubuntu:ubuntu /home/ubun
 sudo mount -t fuse.bindfs /home/projects /home/gsallesl/projects -o <span class="nv">map</span><span class="o">=</span>lxduser/gsallesl:@lxduser/@gsallesl
 
 <span class="c1"># An fstab entry looks as follow to make the mount automatic at startup</span>
-/home/projects  /home/gsallesl/projects     fuse.bindfs     <span class="nv">map</span><span class="o">=</span>lxduser/gsallesl:@lxduser/@gsallesl   <span class="m">0</span>       0
+/home/projects  /home/gsallesl/projects     fuse.bindfs     <span class="nv">map</span><span class="o">=</span>lxduser/gsallesl:@lxduser/@gsallesl   <span class="m">0</span>       <span class="m">0</span>
 
 <span class="c1"># (optional) Hide lxduser user from the lightdm login screen on ubuntu:</span>
 <span class="c1"># http://askubuntu.com/questions/92349/how-do-i-hide-a-particular-user-from-the-login-screen/575390#575390</span>

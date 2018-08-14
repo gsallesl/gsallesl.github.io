@@ -78,7 +78,7 @@ ProxyCommand ssh internet_facing_server_IP -W IPAddress:some_port
 <li>When using a meeting point on another server, for example when the system facing the internet and on the same network as <code>myhost</code> is down:</li>
 </ul>
 <p>On my host:</p>
-<div class="highlight"><pre><span></span>ssh -NR 2345:localhost:22  internet_facing_server2_IP
+<div class="highlight"><pre><span></span>ssh -NR <span class="m">2345</span>:localhost:22  internet_facing_server2_IP
 </pre></div>
 
 
